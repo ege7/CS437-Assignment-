@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your News Website</title>
+    <link rel="stylesheet" href="./src/styles.css" />
+    <script src="https://kit.fontawesome.com/5a67989864.js" crossorigin="anonymous"></script>
+
+    <style>
+
+        .comment-like-container {
+            display: flex;
+            align-items: center; /* Align items vertically in the center */
+            margin-top: 8px; /* Add some top margin for separation */
+        }
+
+        /* Remove margin and padding from comment and like paragraphs */
+        .comment-like-container p {
+            margin: 0;
+            padding: 0;
+            margin-left: 4px; /* Add left margin for spacing between icon and text */
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 15px;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        nav {
+            background-color: #444;
+            overflow: hidden;
+            display: flex;
+        }
+
+        nav a {
+            float: left;
+            display: block;
+            color: #fff;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+        }
+
+        nav a:hover {
+            background-color: #ddd;
+            color: #333;
+        }
+
+        .spacer {
+            flex-grow: 1;
+        }
+
+        /* Push "Technology" link to the right */
+        nav a[href="#technology"] {
+            margin-left: auto;
+        }
+
+        section {
+            padding: 20px;
+        }
+
+        article {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 20px;
+        }
+
+        h2 {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Welcome to AZNews</h1>
+    </header>
+
+    <nav>
+
+        <!-- Spacer -->
+        <div class="spacer"></div>
+
+        <a href="login.html">Login</a>
+        <a href="register.html">Register</a>
+    </nav>
+
+    <section id="newsSection"></section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const newsSection = document.getElementById('newsSection');
+
+        // Replace 'YOUR_SERVER_URL' with the actual URL of your Flask server
+        const serverUrl = 'http://127.0.0.1:5000';
+
+        // grab the link parameter from the URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const link = urlParams.get('link');
+
+        // call the Flask server's get_rss_feed_by_url to get the RSS feed
+        fetch(`${serverUrl}/rss-feed-more/${encodeURIComponent(link)}`)
+            .then(response => response.json())
+            .then(data => {
+                const rssFeed = data.rss_feed;
+                console.log(rssFeed);
+                // Loop through the RSS feed entries and create articles
+                rssFeed.forEach(entry => {
+
+                    console.log(entry);
+                
+                    const title = entry.title;
+                    const link = entry.link;
+                    const description = entry.description;
+                    const pubDate = entry.pub_date;
+                    const text = entry.text;
+
+                    const article = document.createElement('article');
+                    const h2 = document.createElement('h2');
+                    const p = document.createElement('p');
+                    const a = document.createElement('a');
+                    const pubDateParagraph = document.createElement('p');
+
+                    h2.textContent = title;
+                    p.textContent = description;
+                    // make the href load the webpage "newspage.html" with the link as a parameter
+                    a.textContent = text;
+
+                    // Format the publication date
+                    const pubDateFormatted = new Date(pubDate).toLocaleString();
+
+                    pubDateParagraph.textContent = `Published on: ${pubDateFormatted}`;
+
+                    article.appendChild(h2);
+                    article.appendChild(p);
+                    article.appendChild(a);
+                    article.appendChild(pubDateParagraph);
+
+                    newsSection.appendChild(article);
+                });
+            })
+            .catch(error => console.error('Error fetching RSS feed from server:', error));
+        
+    });
+    </script>
+
+
+</body>
+</html>
